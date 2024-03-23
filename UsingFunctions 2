@@ -1,0 +1,21 @@
+.data
+
+.text
+	main:		
+		addi $a1, $zero, 20
+		addi $a2, $zero, 10
+		
+		jal multNumbers
+		
+		addi $a0, $v1, 0
+		
+		li $v0, 1
+		syscall 
+		
+		li $v0, 10
+		syscall
+		
+	multNumbers:
+		mul $v1, $a1, $a2
+		
+		jr $ra
