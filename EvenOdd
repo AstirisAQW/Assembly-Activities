@@ -1,0 +1,24 @@
+.data
+	text_isEven:	.asciiz	"\nNumber is Even"
+	text_isOdd: 	.asciiz	"Number is Odd"
+.text
+	main:
+        	addi $t0, $zero, 3 # Initialize $t0 with the value 2
+
+        	li $t1, 2
+        	div  $t0, $t1
+		mfhi $t2
+
+		bnez $t2, printOdd
+		beqz $t2, printEven
+
+	printOdd:
+		li $v0, 4
+		la $a0, text_isOdd
+		syscall
+
+	printEven:
+        	li $v0, 4
+        	la $a0, text_isEven
+        	syscall
+
