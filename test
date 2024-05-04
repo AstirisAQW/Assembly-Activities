@@ -1,0 +1,103 @@
+.data
+	invalidChoice_text:		.asciiz "Invalid Choice\n"
+	previous_room_error_text:	.asciiz "Can't go back to previous room\n"
+	roomDescription_text1:		.asciiz "You are in a dark, damp room. There is a door to the east.\n" 
+	roomDescription_text2:		.asciiz "You are in a narrow corridor... you see a small room\n"
+	roomDescription_text3:		.asciiz "You are in a small room with a chest. .\n"
+	roomDescription_text4:		.asciiz "You Opened the chest and got a treasure. .\n"
+	roomDescription_text5:		.asciiz "You Have Escaped the Dungeons of Fear & Hunger"
+	room_menu: 			.asciiz "1. View room description\n2. Move to next room\n3. Move to previous room\n4. Quit\n"
+.text
+	# Main loop
+	main:
+    		#Initialize room 
+    		li $t0, 0
+	main_loop:
+    		#Print room menu
+    		la $a0, room_menu
+    		li $v0, 4
+   		syscall
+
+   		#Get player's choice
+    		li $v0, 5
+    		syscall
+    		move $t1, $v0
+
+        	# Check if the choice is valid
+        	li $t2, 1
+        	li $t3, 4
+        	blt $t1, $t2, invalid_choice
+        	bgt $t1, $t3, invalid_choice
+
+    		#Handle player's choice
+    		beq $t1, 1, view_room
+    		beq $t1, 2, next_room
+    		beq $t1, 3, previous_room
+    		beq $t1, 4, quit
+	view_room:
+    		#room description
+    		la $a0, roomDescription_text1
+    		beq $t0, 0, change_room
+    
+    		la $a0, roomDescription_text2
+    		beq $t0, 1, change_room
+    
+   		la $a0, roomDescription_text3
+    		beq $t0, 2, change_room
+    
+    		la $a0, roomDescription_text4
+    		beq $t0, 3, change_room
+    
+    		beq $t0, 4, quit
+    
+    		j main_loop
+	change_room:
+    		li $v0, 4
+    		syscall
+    		j main_loop
+	next_room:
+    		# Move to next room
+    		addiu $t0, $t0, 1
+		blt $t0, 12, main_loop
+    		j main_loop
+    
+	previous_room:
+	   	# Check if the player is in the starting room
+    		beq $t0, 0, previous_room_error
+		#Move to previous room
+    		subiu $t0, $t0, 1
+		bgt $t0, -1, main_loop
+    		j main_loop
+    		
+    	previous_room_error:
+    		# Print error message
+    		la $a0, previous_room_error_text
+    		li $v0, 4
+    		syscall
+    		j main_loop
+    
+	quit:
+    		# Check if the player is in the final room
+    		beq $t0, 4, print_escape_message
+
+    		# If not in the final room, simply exit the program
+    		li $v0, 10
+    		syscall
+
+	print_escape_message:
+    		# Print the escape message
+    		la $a0, roomDescription_text5
+    		li $v0, 4
+    		syscall
+
+    		# Exit the program
+    		li $v0, 10
+    		syscall
+
+  	invalid_choice:
+        	# Print invalid choice message
+        	la $a0, invalidChoice_text
+        	li $v0, 4
+        	syscall
+        	j main_loop
+        	
